@@ -38,6 +38,12 @@ For Cloudflare Git builds, use `pnpm run build` as the build command and
 root directory. This project targets **Workers with Static Assets**. Plain
 static hosting of `out/` alone will not provide the release API.
 
+The project enforces pnpm's 24-hour minimum release age, including during
+dependency updates. Wrangler and Node type definitions are pinned to versions
+that satisfy that policy. Commit `package.json`, `pnpm-workspace.yaml`, and
+`pnpm-lock.yaml` together after dependency changes; Cloudflare installs using
+`pnpm install --frozen-lockfile`.
+
 To test the production build locally or package it without publishing:
 
 ```sh
