@@ -6,16 +6,16 @@ onto an **Arduino Mega 2560 (ATmega2560)** from a desktop browser.
 
 ## Run locally
 
-Requires Node.js 22 or newer.
+Requires Node.js 22 or newer and pnpm 12.8.1 (pinned in `package.json`).
 
 ```sh
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 Open **http://localhost:3000**. The dev command runs Next.js on port 3000 and the
 Cloudflare API on port 8787, with `/api/*` proxied through Next. It stops both
-servers when interrupted. You can also run `npm run dev:web` and `npm run dev:api`
+servers when interrupted. You can also run `pnpm run dev:web` and `pnpm run dev:api`
 in separate terminals.
 
 ## Deploy on Cloudflare Workers
@@ -25,24 +25,24 @@ serves these files and handles release downloads. No OpenNext adapter, Node
 server, database, container, or firmware compilation service is needed.
 
 ```sh
-npx wrangler login
-npm run deploy
+pnpm exec wrangler login
+pnpm run deploy
 ```
 
 The deploy script builds Next.js and publishes the Worker and its assets using
 `wrangler.jsonc`. The default name is `jaguar-web-programmer`; change it before
 deploying if needed. Wrangler prints the HTTPS URL when publishing succeeds.
 
-For Cloudflare Git builds, use `npm run build` as the build command and
-`npx wrangler deploy` as the deploy command, with the repository root as the
+For Cloudflare Git builds, use `pnpm run build` as the build command and
+`pnpm exec wrangler deploy` as the deploy command, with the repository root as the
 root directory. This project targets **Workers with Static Assets**. Plain
 static hosting of `out/` alone will not provide the release API.
 
 To test the production build locally or package it without publishing:
 
 ```sh
-npm run preview
-npm run deploy:check
+pnpm run preview
+pnpm run deploy:check
 ```
 
 The API caches successful responses at the edge for five minutes. It resolves
@@ -57,7 +57,7 @@ are shared by requests from the same address; a token can raise the allowance.
 No repository write permission is needed for this public repository.
 
 ```sh
-npx wrangler secret put GITHUB_TOKEN
+pnpm exec wrangler secret put GITHUB_TOKEN
 ```
 
 For local development, copy `.dev.vars.example` to `.dev.vars` and set the token
@@ -102,9 +102,9 @@ includes instructions for timeouts, unsupported browsers and missing devices.
 ## Verification
 
 ```sh
-npm test
-npm run typecheck
-npm run deploy:check
+pnpm test
+pnpm run typecheck
+pnpm run deploy:check
 ```
 
 The suite exercises extended HEX addresses, bootloader protection, bad

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@12.8.1",
   "engines": { "node": ">=22" },
   "scripts": {
     "dev": "node scripts/dev.mjs",
@@ -11,9 +12,9 @@
     "build": "next build --webpack",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test tests/*.test.ts",
-    "preview": "npm run build && wrangler dev",
-    "deploy": "npm run build && wrangler deploy",
-    "deploy:check": "npm run build && wrangler deploy --dry-run"
+    "preview": "pnpm run build && wrangler dev",
+    "deploy": "pnpm run build && wrangler deploy",
+    "deploy:check": "pnpm run build && wrangler deploy --dry-run"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

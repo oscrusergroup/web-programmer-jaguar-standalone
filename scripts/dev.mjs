@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 
 // Run the Next UI and its same-origin API together; terminate both on exit.
 const children = ["dev:api", "dev:web"].map((script) =>
-  spawn("npm", ["run", script], { stdio: "inherit", detached: process.platform !== "win32" }),
+  spawn("pnpm", ["run", script], { stdio: "inherit", detached: process.platform !== "win32" }),
 );
 let stopping = false;
 function stop(code = 0) {
