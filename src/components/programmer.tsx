@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { ArrowDownToLine, ArrowUpRight, Check, ChevronDown, ChevronRight, CircleAlert, CircleCheck, Code2, Cpu, Github, LoaderCircle, PlugZap, RefreshCw, ShieldCheck, Terminal, Unplug, Usb, X } from "lucide-react";
-import { BoardArt } from "./board-art";
+import { ThemeToggle } from "./theme-toggle";
 import { SetupGuide } from "./setup-guide";
 import { downloadFirmware, REPOSITORY, type FirmwareRelease } from "@/lib/release";
 import { parseHex } from "@/lib/serial/hex";
@@ -125,7 +126,8 @@ export function Programmer() {
       <nav aria-label="Main navigation" className="nav-links">
         <button className={view === "programmer" ? "nav-button active" : "nav-button"} onClick={() => setView("programmer")} disabled={busy}>Programmer</button>
         <button className={view === "guide" ? "nav-button active" : "nav-button"} onClick={() => setView("guide")} disabled={busy}>Setup guide</button>
-        <a className="github-link" href={REPOSITORY} target="_blank" rel="noreferrer"><Github size={17}/><span>GitHub</span><ArrowUpRight size={13}/></a>
+        <a className="github-link" href={REPOSITORY} target="_blank" rel="noreferrer" aria-label="GitHub repository"><Github size={17}/><span>GitHub</span><ArrowUpRight size={13}/></a>
+        <ThemeToggle/>
       </nav>
     </div></header>
 
@@ -139,12 +141,12 @@ export function Programmer() {
 
         <div className="workspace-grid">
           <section className="program-panel" aria-labelledby="program-heading">
-            <div className="panel-heading"><div><h2 id="program-heading">Let’s update your reader</h2><p>Three steps. One fresh start.</p></div><span className="panel-icon"><Cpu size={21}/></span></div>
+            <div className="panel-heading"><div><h2 id="program-heading">Let’s update your reader</h2><p>Three steps. One fresh start.</p></div></div>
             <div className="steps">
               <section className={`step ${currentStep === 1 ? "current" : ""}`} aria-labelledby="firmware-heading">
                 <span className={`step-marker ${release ? "complete" : ""}`}>{release ? <Check size={15}/> : "1"}</span>
                 <div className="step-content"><div className="step-heading"><h3 id="firmware-heading">Get the latest firmware</h3><button className="icon-button" onClick={() => void loadRelease()} disabled={loading || busy} aria-label="Refresh latest release"><RefreshCw size={15} className={loading ? "spin" : ""}/></button></div><p>Official release from breyell/jaguarcartreader.</p>
-                  {loading ? <div className="release-box loading-release"><span className="skeleton w-24"/><span className="skeleton w-36"/></div> : releaseError ? <div className="release-error" role="alert"><CircleAlert size={17}/><div>{releaseError}<button onClick={() => void loadRelease()} className="text-link mt-2 block">Try again</button></div></div> : release && <div className="release-box"><div className="release-top"><span className="version">{release.tag}</span><span className="latest-badge">Latest stable</span><a className="release-link" href={release.url} target="_blank" rel="noreferrer" aria-label={`View ${release.tag} release notes`}><ArrowUpRight size={17}/></a></div><div className="release-meta"><span>{date}</span><span className="meta-dot"/><span>{(release.firmware.size / 1024).toFixed(1)} KB download</span></div><div className="firmware-file"><Code2 size={13}/><span>{release.firmware.name}</span><a href={release.firmware.url} aria-label="Download firmware HEX file"><ArrowDownToLine size={14}/></a></div></div>}
+                  {loading ? <div className="release-box loading-release"><span className="skeleton w-24"/><span className="skeleton w-36"/></div> : releaseError ? <div className="release-error" role="alert"><CircleAlert size={17}/><div>{releaseError}<button onClick={() => void loadRelease()} className="text-link mt-2 block">Try again</button></div></div> : release && <div className="release-box"><div className="release-top"><span className="version">{release.tag}</span><span className="latest-badge">Latest stable</span><a className="release-link" href={release.url} target="_blank" rel="noreferrer" aria-label={`View ${release.tag} release notes`}><ArrowUpRight size={17}/></a></div><div className="release-meta"><span>{date}</span><span className="meta-dot"/><span>{(release.firmware.size / 1024).toFixed(1)} KB download</span></div><div className="firmware-file"><Code2 size={13}/><span>{release.firmware.name}</span></div></div>}
                 </div>
               </section>
 
@@ -173,8 +175,9 @@ export function Programmer() {
 
           <aside className="hardware-column" aria-label="Target hardware">
             <div className="hardware-card"><div className="hardware-card-top"><span className="hardware-label"><span className="tiny-chip"><Cpu size={14}/></span>Target hardware</span><span className="chip-badge">ATmega2560</span></div>
-              <div className="board-stage"><div className="board-dot-grid"/><div className="board-caption">The heart of your reader.</div><BoardArt active={Boolean(port)}/><div className={`board-status ${port ? "selected" : ""}`}>{busy ? <LoaderCircle size={14} className="spin"/> : port ? <Usb size={14}/> : <Unplug size={14}/>}<span>{busy ? "USB transfer in progress" : port ? "USB device selected" : "Waiting for your USB device"}</span></div></div>
-              <div className="hardware-details"><div><h2>Arduino Mega 2560</h2><p>Built for the Jaguar cartridge reader.</p></div><dl><div><dt>Processor</dt><dd>ATmega2560</dd></div><div><dt>Upload speed</dt><dd>115,200 baud</dd></div><div><dt>Connection</dt><dd>USB serial</dd></div></dl></div>
+              <div className="board-stage"><Image src="/jaguar-reader.webp" alt="Blue Jaguar cartridge reader board with cartridge slot and OLED display" width={1448} height={1086} className="reader-photo" loading="eager"/></div>
+              <div className={`board-status ${port ? "selected" : ""}`}>{busy ? <LoaderCircle size={14} className="spin"/> : port ? <Usb size={14}/> : <Unplug size={14}/>}<span>{busy ? "USB transfer in progress" : port ? "USB device selected" : "Waiting for your USB device"}</span></div>
+              <div className="hardware-details"><div><h2>Jaguar cartridge reader</h2><p>Powered by an Arduino Mega 2560.</p></div><dl><div><dt>Processor</dt><dd>ATmega2560</dd></div><div><dt>Upload speed</dt><dd>115,200 baud</dd></div><div><dt>Connection</dt><dd>USB serial</dd></div></dl></div>
             </div>
 
           </aside>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 export const metadata: Metadata = {
   title: "Jaguar Reader · Web Programmer",
@@ -6,5 +7,5 @@ export const metadata: Metadata = {
   icons: { icon: "/icon.svg" },
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body>{children}</body></html>;
+  return <html lang="en" suppressHydrationWarning><head><script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }}/></head><body>{children}</body></html>;
 }

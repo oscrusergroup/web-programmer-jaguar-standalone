@@ -2,6 +2,8 @@ node_modules/
 .next/
 out/
 .wrangler/
+.playwright-cli/
+output/playwright/
 dist/
 *.tsbuildinfo
 .env*

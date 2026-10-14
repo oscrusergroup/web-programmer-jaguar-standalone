@@ -4,6 +4,15 @@ A Next.js 16 + React 19 + Tailwind CSS 4 app that flashes the latest stable
 [breyell/jaguarcartreader](https://github.com/breyell/jaguarcartreader) release
 onto an **Arduino Mega 2560 (ATmega2560)** from a desktop browser.
 
+The hardware panel uses a transparent WebP cutout of the supplied Jaguar reader
+photograph. The original is retained in `docs/source/jaguar-reader-original.png`.
+The `jag.txt` download below the install button includes instructions to copy it
+to the root of the SD card. The header's
+sun/moon button switches between light and black dark mode. The initial theme
+follows your system setting; an explicit selection is saved in your browser
+and applied before the page renders. If browser storage is blocked, the toggle
+still works for the current visit.
+
 ## Run locally
 
 Requires Node.js 22 or newer and pnpm 12.8.1 (pinned in `package.json`).
