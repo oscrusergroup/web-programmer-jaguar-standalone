@@ -6,12 +6,14 @@ import { ArrowDownToLine, ArrowUpRight, Check, ChevronDown, ChevronRight, Circle
 import { ThemeToggle } from "./theme-toggle";
 import { SetupGuide } from "./setup-guide";
 import { heading1, inlineCode, textLink } from "./styles";
-import { downloadFirmware, REPOSITORY, type FirmwareRelease } from "@/lib/release";
+import { downloadFirmware, type FirmwareRelease } from "@/lib/release";
 import { parseHex } from "@/lib/serial/hex";
 import { serialAPI, uploadFirmware, type SerialPort } from "@/lib/serial/web-serial";
 
 type Entry = { time: string; message: string; kind: "info" | "error" | "success" };
 const errorMessage = (error: unknown) => error instanceof Error ? error.message : String(error);
+
+const APP_REPOSITORY = "https://github.com/oscrusergroup/web-programmer-jaguar-standalone";
 
 const container = "mx-auto max-w-300 px-4 xs:px-5 sm:px-6 md:px-9.5 xl:max-w-310";
 const notice = "flex items-start gap-3 rounded-lg border p-4 text-xs leading-loose sm:px-5 sm:text-sm";
@@ -141,7 +143,7 @@ export function Programmer() {
       <nav aria-label="Main navigation" className="flex h-12 w-full items-center gap-2 2xs:h-full 2xs:w-auto xs:gap-3 sm:gap-7">
         <button className={navButton(view === "programmer")} onClick={() => setView("programmer")} disabled={busy}>Programmer</button>
         <button className={navButton(view === "guide")} onClick={() => setView("guide")} disabled={busy}>Setup guide</button>
-        <a className="ml-auto flex items-center gap-2 text-sm text-muted hover:text-accent 2xs:ml-0 sm:border-l sm:border-line sm:pl-6" href={REPOSITORY} target="_blank" rel="noreferrer" aria-label="GitHub repository"><Github size={17}/><span className="hidden sm:inline">GitHub</span><ArrowUpRight size={13} className="hidden sm:block"/></a>
+        <a className="ml-auto flex items-center gap-2 text-sm text-muted hover:text-accent 2xs:ml-0 sm:border-l sm:border-line sm:pl-6" href={APP_REPOSITORY} target="_blank" rel="noreferrer" aria-label="GitHub repository"><Github size={17}/><span className="hidden sm:inline">GitHub</span></a>
         <ThemeToggle/>
       </nav>
     </div></header>
