@@ -45,11 +45,10 @@ button svg, a svg { flex-shrink: 0; }
 .app-shell { min-height: 100vh; }
 .site-header { background: var(--panel); border-bottom: 1px solid var(--line); }
 .header-inner { max-width: 1200px; padding: 0 38px; height: 84px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-.brand { display: flex; align-items: center; gap: 11px; font-size: 23px; font-weight: 750; letter-spacing: -.9px; color: var(--ink); }
-.brand-icon { color: var(--red); display: flex; }
-.brand-light { font-weight: 400; }
-.brand-divider { height: 22px; width: 1px; background: var(--line); margin: 0 7px; }
-.brand-subtitle { font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+.brand { display: flex; flex-direction: column; gap: 2px; color: var(--ink); }
+.brand-title { font-size: 19px; font-weight: 750; letter-spacing: -.6px; line-height: 1.2; white-space: nowrap; }
+.brand-kicker { font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 0; line-height: 1.2; }
+.brand-subtitle { font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
 .nav-links { display: flex; align-items: center; gap: 29px; height: 100%; }
 .nav-button { height: 100%; background: none; border: 0; color: var(--muted); padding: 0; font-size: 12px; font-weight: 600; position: relative; }
 .nav-button.active { color: var(--ink); }
@@ -58,8 +57,6 @@ button svg, a svg { flex-shrink: 0; }
 .github-link:hover, .nav-button:hover { color: var(--red); }
 .main-content { max-width: 1200px; padding: 0 38px; margin: auto; }
 .intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 56px 0 37px; }
-.intro-kicker { font-size: 12px; font-weight: 600; color: var(--muted); display: flex; align-items: center; gap: 9px; margin-bottom: 18px; }
-.red-line { width: 20px; height: 2px; background: var(--red); }
 h1 { font-size: clamp(36px, 4vw, 49px); line-height: 1.12; font-weight: 650; letter-spacing: -2px; margin: 0; }
 .intro p { font-size: 14px; line-height: 1.85; color: var(--muted); margin: 17px 0 0; }
 .browser-note { margin-bottom: 3px; border: 1px solid var(--success-line); background: var(--success-bg); border-radius: 8px; padding: 14px 17px; font-size: 11px; color: var(--muted); }
@@ -159,8 +156,6 @@ code { font-family: "SFMono-Regular", Consolas, monospace; font-size: .92em; bac
 .help-strip button { display: flex; align-items: center; gap: 3px; font-size: 10px; }
 .site-footer { max-width: 1124px; margin: auto; padding: 21px 0 28px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); font-size: 10px; color: var(--muted); }
 .site-footer > div { display: flex; gap: 9px; align-items: center; }
-.footer-mark { color: var(--muted); display: flex; }
-.footer-mark svg { width: 20px; height: 20px; }
 .site-footer a { display: flex; align-items: center; gap: 4px; color: var(--muted); }
 .notice { display: flex; align-items: flex-start; gap: 12px; padding: 16px 20px; border: 1px solid var(--warning-line); background: var(--warning-bg); color: var(--warning-text); border-radius: 8px; font-size: 12px; line-height: 1.8; margin-bottom: 22px; }
 .notice > svg { flex-shrink: 0; margin-top: 2px; }
@@ -192,16 +187,16 @@ code { font-family: "SFMono-Regular", Consolas, monospace; font-size: .92em; bac
 .troubleshooting summary { font-size: 12px; font-weight: 600; cursor: pointer; }
 .troubleshooting p { max-width: 750px; margin: 11px 0 0; }
 @media (min-width: 1400px) { .intro { padding-top: 66px; padding-bottom: 44px; } .main-content { max-width: 1240px; } .header-inner { max-width: 1240px; } .site-footer { max-width: 1164px; } }
-@media (max-width: 950px) { .brand-subtitle, .brand-divider { display: none; } .header-inner, .main-content { padding-left: 25px; padding-right: 25px; } .site-footer { margin: 0 25px; } .workspace-grid { gap: 18px; } .steps { padding-left: 21px; padding-right: 21px; } .panel-heading { padding-left: 21px; padding-right: 21px; } .step { gap: 12px; } .hardware-details { padding: 23px 20px; } .browser-note { padding: 12px; } .help-strip { flex-wrap: wrap; } }
-@media (max-width: 720px) { .header-inner { height: 72px; padding: 0 20px; } .brand { font-size: 20px; gap: 8px; } .brand-icon svg { width: 31px; height: 31px; } .nav-links { gap: 18px; } .github-link { padding-left: 0; border: 0; } .github-link span, .github-link svg:last-child { display: none; } .nav-button { font-size: 11px; } .main-content { padding: 0 20px; } .intro { padding: 37px 0 28px; display: block; } h1 { font-size: 39px; letter-spacing: -1.6px; } .intro-kicker { font-size: 10px; margin-bottom: 17px; } .intro p { font-size: 13px; } .browser-note { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 15px; margin-top: 23px; font-size: 10px; padding: 12px 14px; } .browser-status { font-size: 11px; margin-bottom: 0; } .workspace-grid { grid-template-columns: 1fr; gap: 20px; } .program-panel { order: 0; } .hardware-column { order: 1; } .panel-heading { padding: 22px; } .steps { padding: 24px 23px; } .step { gap: 15px; } .hardware-details dl { gap: 15px; } .activity-summary { display: none; } .activity-toggle > svg:last-child { margin-left: auto; } .help-strip { gap: 8px; line-height: 1.8; margin: 22px 0 28px; } .help-strip p { text-align: center; } .site-footer { margin: 0 20px; flex-direction: column; gap: 15px; padding-top: 21px; padding-bottom: 25px; } .guide { padding-top: 36px; } .guide-grid { grid-template-columns: 1fr; gap: 14px; } .guide-card { padding: 24px; } .troubleshooting { padding: 22px; } .notice { font-size: 11px; padding: 15px; } }
-@media (max-width: 390px) { .header-inner, .main-content { padding-left: 15px; padding-right: 15px; } .nav-links { gap: 12px; } .brand { font-size: 18px; } h1 { font-size: 35px; } .steps { padding-left: 17px; padding-right: 17px; } .step { gap: 11px; } .latest-badge { font-size: 8px; } .readiness-check { font-size: 9px; } }
+@media (max-width: 950px) { .header-inner, .main-content { padding-left: 25px; padding-right: 25px; } .site-footer { margin: 0 25px; } .workspace-grid { gap: 18px; } .steps { padding-left: 21px; padding-right: 21px; } .panel-heading { padding-left: 21px; padding-right: 21px; } .step { gap: 12px; } .hardware-details { padding: 23px 20px; } .browser-note { padding: 12px; } .help-strip { flex-wrap: wrap; } }
+@media (max-width: 720px) { .header-inner { height: 72px; padding: 0 20px; } .brand-title { font-size: 16px; } .brand-kicker { font-size: 11px; } .brand-subtitle { font-size: 9px; } .nav-links { gap: 18px; } .github-link { padding-left: 0; border: 0; } .github-link span, .github-link svg:last-child { display: none; } .nav-button { font-size: 11px; } .main-content { padding: 0 20px; } .intro { padding: 37px 0 28px; display: block; } h1 { font-size: 39px; letter-spacing: -1.6px; } .browser-note { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 15px; margin-top: 23px; font-size: 10px; padding: 12px 14px; } .browser-status { font-size: 11px; margin-bottom: 0; } .workspace-grid { grid-template-columns: 1fr; gap: 20px; } .program-panel { order: 0; } .hardware-column { order: 1; } .panel-heading { padding: 22px; } .steps { padding: 24px 23px; } .step { gap: 15px; } .hardware-details dl { gap: 15px; } .activity-summary { display: none; } .activity-toggle > svg:last-child { margin-left: auto; } .help-strip { gap: 8px; line-height: 1.8; margin: 22px 0 28px; } .help-strip p { text-align: center; } .site-footer { margin: 0 20px; flex-direction: column; gap: 15px; padding-top: 21px; padding-bottom: 25px; } .guide { padding-top: 36px; } .guide-grid { grid-template-columns: 1fr; gap: 14px; } .guide-card { padding: 24px; } .troubleshooting { padding: 22px; } .notice { font-size: 11px; padding: 15px; } }
+@media (max-width: 390px) { .header-inner, .main-content { padding-left: 15px; padding-right: 15px; } .nav-links { gap: 12px; } .brand-title { font-size: 15px; } h1 { font-size: 35px; } .steps { padding-left: 17px; padding-right: 17px; } .step { gap: 11px; } .latest-badge { font-size: 8px; } .readiness-check { font-size: 9px; } }
 @media (prefers-reduced-motion: reduce) { *, *:before, *:after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
 
 .reader-photo { display: block; width: 100%; height: auto; }
 .theme-toggle { display: grid; place-items: center; width: 36px; height: 36px; flex-shrink: 0; padding: 0; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--surface); }
 .theme-toggle:hover { background: var(--hover); }
 @media (max-width: 720px) { .nav-links { gap: 12px; } .theme-toggle { width: 32px; height: 32px; } }
-@media (max-width: 390px) { .nav-links { gap: 9px; } .brand { gap: 6px; font-size: 17px; } .brand-icon svg { width: 28px; height: 28px; } }
+@media (max-width: 390px) { .nav-links { gap: 9px; } .brand-title { font-size: 14px; } .brand-kicker { font-size: 10px; } .brand-subtitle { font-size: 8px; } }
 @media (max-width: 360px) {
   .header-inner { flex-wrap: wrap; height: auto; padding-top: 14px; gap: 4px; }
   .nav-links { width: 100%; height: 48px; }

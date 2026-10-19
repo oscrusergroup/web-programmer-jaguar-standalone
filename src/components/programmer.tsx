@@ -11,9 +11,6 @@ import { serialAPI, uploadFirmware, type SerialPort } from "@/lib/serial/web-ser
 
 type Entry = { time: string; message: string; kind: "info" | "error" | "success" };
 const errorMessage = (error: unknown) => error instanceof Error ? error.message : String(error);
-function ClawMark() {
-  return <svg viewBox="0 0 36 36" width="36" height="36" aria-hidden="true"><rect width="36" height="36" rx="10" fill="currentColor"/><path d="m8 25 7-15h4l-7 15zm8 0 7-15h4l-7 15zm8 0 7-15h3l-7 15z" fill="white" transform="translate(-2 0)"/></svg>;
-}
 
 export function Programmer() {
   const [view, setView] = useState<"programmer" | "guide">("programmer");
@@ -122,7 +119,7 @@ export function Programmer() {
 
   return <div className="app-shell">
     <header className="site-header"><div className="header-inner">
-      <a className="brand" href="/" aria-label="Jaguar Reader home"><span className="brand-icon"><ClawMark/></span><span>jaguar<span className="brand-light">reader</span></span><span className="brand-divider"/><span className="brand-subtitle">Web programmer</span></a>
+      <a className="brand" href="/" aria-label="OSCR Programmer home"><span className="brand-kicker">Standalone Jaguar</span><span className="brand-title">OSCR Programmer</span><span className="brand-subtitle">Open Source Cartridge Reader</span></a>
       <nav aria-label="Main navigation" className="nav-links">
         <button className={view === "programmer" ? "nav-button active" : "nav-button"} onClick={() => setView("programmer")} disabled={busy}>Programmer</button>
         <button className={view === "guide" ? "nav-button active" : "nav-button"} onClick={() => setView("guide")} disabled={busy}>Setup guide</button>
@@ -133,7 +130,7 @@ export function Programmer() {
 
     <main className="main-content">
       {view === "guide" ? <SetupGuide/> : <>
-        <section className="intro"><div><div className="intro-kicker"><span className="red-line"/>Built for your Atari Jaguar cartridge reader</div><h1>New firmware.<br/>Same great hardware.</h1><p>Keep your reader up to date. Install the latest firmware<br className="desktop-break"/> directly from your browser, in just a few steps.</p></div>
+        <section className="intro"><div><h1>Program your OSCR</h1></div>
           <div className="browser-note"><div className={`browser-status ${supported === false ? "unsupported" : ""}`}><span className="status-dot"/>{supported === null ? "Checking browser" : supported ? "Your browser is ready" : "Use desktop Chrome or Edge"}</div><span>USB connection · No install needed</span></div>
         </section>
 
@@ -191,6 +188,6 @@ export function Programmer() {
         <div className="help-strip"><span><CircleAlert size={15}/>First time here?</span><p>A USB data cable and a desktop browser are all you need.</p><button className="text-link" onClick={() => setView("guide")} disabled={busy}>Read the setup guide <ArrowUpRight size={14}/></button></div>
       </>}
     </main>
-    <footer className="site-footer"><div><span className="footer-mark"><ClawMark/></span><span>Made for the Jaguar preservation community.</span></div><a href={REPOSITORY} target="_blank" rel="noreferrer">Open source firmware <ArrowUpRight size={13}/></a></footer>
+    <footer className="site-footer"><a href="https://github.com/oscrusergroup" target="_blank" rel="noreferrer">Open Source Cartridge Reader User Group</a></footer>
   </div>;
 }
