@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { normalizeRelease, handleApi, type ReleaseStore } from "../cloudflare/api";
+import { normalizeRelease, handleApi, retryDelay, type ReleaseStore } from "../cloudflare/api";
 import type { FirmwareRelease } from "../src/lib/release";
+
+retryDelay.ms = 0;
 
 const tag = "v1.0.0";
 const asset = (name: string) => ({
@@ -117,10 +119,27 @@ test("asset requests are pinned to selected tag and cannot proxy arbitrary files
   assert.equal(method.status, 405);
 });
 
-test("failed asset downloads do not produce a successful firmware response", async () => {
+test("failed asset downloads do not produce a successful firmware response", async (context) => {
+  const warn = context.mock.method(console, "warn", () => {});
   let calls = 0;
   const response = await handleApi(new Request("https://reader.example/api/assets?tag=v1.0.0&file=jaguarcartreader-mega2560.hex"), {}, async () => ++calls === 1 ? Response.json(release) : new Response("", { status: 502 }));
   assert.equal(response.status, 502);
+  assert.equal(calls, 4, "metadata plus three download attempts");
+  const [, details] = warn.mock.calls[2].arguments as [string, { attempt: number; status: number }];
+  assert.deepEqual([details.attempt, details.status], [3, 502]);
+});
+
+test("retries a transient GitHub download failure before serving the file", async (context) => {
+  context.mock.method(console, "warn", () => {});
+  let downloads = 0;
+  const response = await handleApi(new Request("https://reader.example/api/assets?tag=v1.0.0&file=jaguarcartreader-mega2560.hex"), {}, async (input) => {
+    if (String(input).includes("api.github.com")) return Response.json(downloadRelease);
+    if (++downloads === 1) throw new TypeError("connection reset");
+    return downloads === 2 ? new Response("", { status: 503 }) : new Response(downloadBody);
+  });
+  assert.equal(response.status, 200);
+  assert.equal(downloads, 3);
+  assert.equal(await response.text(), downloadBody);
 });
 
 test("rejects truncated or corrupted asset bytes before serving firmware or database downloads", async () => {

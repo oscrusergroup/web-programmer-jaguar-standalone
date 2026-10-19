@@ -60,6 +60,26 @@ function logGitHubFailure(env: ApiEnv, response: Response | null, error?: unknow
   });
 }
 
+// GitHub's release file host fails intermittently, so retry before reporting an error.
+const DOWNLOAD_ATTEMPTS = 3;
+export const retryDelay = { ms: 250 };
+async function downloadAsset(url: string, fetcher: typeof fetch): Promise<Response | null> {
+  for (let attempt = 1; attempt <= DOWNLOAD_ATTEMPTS; attempt++) {
+    let response: Response | null = null;
+    let error: unknown;
+    try {
+      response = await fetcher(url, { signal: AbortSignal.timeout(30_000), headers: { "User-Agent": "jaguar-web-programmer" } });
+      if (response.ok) return response;
+    } catch (caught) { error = caught; }
+    console.warn("GitHub asset download failed", {
+      url, attempt, status: response?.status ?? null,
+      error: error === undefined ? null : error instanceof Error ? error.message : String(error),
+    });
+    if (attempt < DOWNLOAD_ATTEMPTS) await new Promise((resolve) => setTimeout(resolve, retryDelay.ms * attempt));
+  }
+  return null;
+}
+
 export async function handleApi(request: Request, env: ApiEnv, fetcher: typeof fetch = fetch, store?: ReleaseStore): Promise<Response> {
   try {
     const url = new URL(request.url);
@@ -95,8 +115,8 @@ export async function handleApi(request: Request, env: ApiEnv, fetcher: typeof f
     if (release.tag !== tag) throw new ApiError("The release tag changed. Refresh the release before downloading.", 409);
     const selected = filename === FIRMWARE_NAME ? release.firmware : release.database;
     if (!selected) throw new ApiError("This release does not include jag.txt.", 404);
-    const download = await fetcher(`${REPOSITORY}/releases/download/${encodeURIComponent(tag!)}/${filename}`, { signal: AbortSignal.timeout(30_000), headers: { "User-Agent": "jaguar-web-programmer" } });
-    if (!download.ok) throw new ApiError("GitHub could not provide the release file. Try the download again.", 502);
+    const download = await downloadAsset(`${REPOSITORY}/releases/download/${encodeURIComponent(tag!)}/${filename}`, fetcher);
+    if (!download) throw new ApiError("GitHub could not provide the release file. Try the download again.", 502);
     const data = await download.arrayBuffer();
     if (data.byteLength > MAX_ASSET_SIZE) throw new ApiError("Release file exceeds the allowed size.", 502);
     if (data.byteLength !== selected.size) throw new ApiError("The release download is incomplete. Try again in a few minutes.", 502);
