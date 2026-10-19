@@ -35,7 +35,7 @@ export function ThemeToggle() {
   }
 
   const label = theme === "dark" ? "Switch to light mode" : "Switch to dark mode";
-  return <button type="button" className="theme-toggle" onClick={toggle} aria-label={label} title={label}>
+  return <button type="button" className="grid size-8 shrink-0 place-items-center rounded-lg border border-line bg-surface text-ink hover:bg-hover sm:size-9" onClick={toggle} aria-label={label} title={label}>
     {theme === "dark" ? <Sun size={17}/> : <Moon size={17}/>}
   </button>;
 }
