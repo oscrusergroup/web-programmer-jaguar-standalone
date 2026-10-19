@@ -5,11 +5,11 @@ import { normalizeRelease, handleApi } from "../cloudflare/api";
 const tag = "v1.0.0";
 const asset = (name: string) => ({
   name, size: 200, digest: "sha256:" + "a".repeat(64),
-  browser_download_url: `https://github.com/breyell/jaguarcartreader/releases/download/${tag}/${name}`,
+  browser_download_url: `https://github.com/oscrusergroup/firmware-jaguar-standalone/releases/download/${tag}/${name}`,
 });
 const release = {
   tag_name: tag, name: tag, published_at: "2026-10-02T05:54:06Z",
-  html_url: `https://github.com/breyell/jaguarcartreader/releases/tag/${tag}`,
+  html_url: `https://github.com/oscrusergroup/firmware-jaguar-standalone/releases/tag/${tag}`,
   draft: false, prerelease: false,
   assets: [asset("jaguarcartreader-mega2560.hex"), asset("jag.txt")],
 };

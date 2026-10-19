@@ -1,8 +1,10 @@
 # Jaguar Reader Web Programmer
 
 A Next.js 16 + React 19 + Tailwind CSS 4 app that flashes the latest stable
-[breyell/jaguarcartreader](https://github.com/breyell/jaguarcartreader) release
+[oscrusergroup/firmware-jaguar-standalone](https://github.com/oscrusergroup/firmware-jaguar-standalone) release
 onto an **Arduino Mega 2560 (ATmega2560)** from a desktop browser.
+
+Source: [oscrusergroup/web-programmer-jaguar-standalone](https://github.com/oscrusergroup/web-programmer-jaguar-standalone)
 
 The hardware panel uses a transparent WebP cutout of the supplied Jaguar reader
 photograph. The original is retained in `docs/source/jaguar-reader-original.png`.
@@ -142,7 +144,7 @@ The uploader and its protocol tests were adapted from the neighboring
 
 ## References
 
-- [Firmware repository and release assets](https://github.com/breyell/jaguarcartreader)
+- [Firmware repository and release assets](https://github.com/oscrusergroup/firmware-jaguar-standalone)
 - [Arduino Mega STK500v2 bootloader source](https://github.com/arduino/ArduinoCore-avr/tree/master/bootloaders/stk500v2)
 - [Chrome Web Serial documentation](https://developer.chrome.com/docs/capabilities/serial)
 - [Next.js static exports](https://nextjs.org/docs/app/guides/static-exports)

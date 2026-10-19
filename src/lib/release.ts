@@ -1,4 +1,4 @@
-export const REPOSITORY = "https://github.com/breyell/jaguarcartreader";
+export const REPOSITORY = "https://github.com/oscrusergroup/firmware-jaguar-standalone";
 export const FIRMWARE_NAME = "jaguarcartreader-mega2560.hex";
 export interface ReleaseAsset {
   name: string;

@@ -1,7 +1,7 @@
 # Jaguar Web Programmer
 
 Build a Next.js and Tailwind CSS app to install the latest stable release from
-breyell/jaguarcartreader onto its Arduino Mega 2560, deployable on Cloudflare.
+oscrusergroup/firmware-jaguar-standalone onto its Arduino Mega 2560, deployable on Cloudflare.
 
 ## Design
 

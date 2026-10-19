@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "jaguar-web-programmer",
+  "name": "jaguar-cartreader-web-programmer",
   "main": "cloudflare/worker.ts",
   "compatibility_date": "2026-10-02",
   "assets": {

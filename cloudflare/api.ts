@@ -1,6 +1,6 @@
 import { FIRMWARE_NAME, REPOSITORY, type FirmwareRelease, type ReleaseAsset } from "../src/lib/release";
 
-const API = "https://api.github.com/repos/breyell/jaguarcartreader";
+const API = "https://api.github.com/repos/oscrusergroup/firmware-jaguar-standalone";
 const MAX_ASSET_SIZE = 1_048_576;
 const validTag = (tag: string) => /^[a-zA-Z0-9][a-zA-Z0-9._+-]{0,99}$/.test(tag);
 type ObjectValue = Record<string, unknown>;
