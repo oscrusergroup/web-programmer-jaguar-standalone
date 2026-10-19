@@ -39,7 +39,28 @@ class ApiError extends Error {
   constructor(message: string, public status: number) { super(message); }
 }
 export interface ApiEnv { GITHUB_TOKEN?: string }
-export async function handleApi(request: Request, env: ApiEnv, fetcher: typeof fetch = fetch): Promise<Response> {
+// Keeps the last release that passed validation so GitHub outages and rate limits don't block updates.
+export interface ReleaseStore {
+  get(): Promise<FirmwareRelease | null>;
+  put(release: FirmwareRelease): Promise<void>;
+}
+
+function logGitHubFailure(env: ApiEnv, response: Response | null, error?: unknown) {
+  const header = (name: string) => response?.headers.get(name) ?? null;
+  const reset = Number(header("x-ratelimit-reset"));
+  console.warn("GitHub release lookup failed", {
+    status: response?.status ?? null,
+    error: error === undefined ? null : error instanceof Error ? error.message : String(error),
+    authenticated: Boolean(env.GITHUB_TOKEN),
+    rateLimit: {
+      limit: header("x-ratelimit-limit"), remaining: header("x-ratelimit-remaining"), used: header("x-ratelimit-used"),
+      resource: header("x-ratelimit-resource"), reset: reset ? new Date(reset * 1000).toISOString() : null,
+    },
+    retryAfter: header("retry-after"),
+  });
+}
+
+export async function handleApi(request: Request, env: ApiEnv, fetcher: typeof fetch = fetch, store?: ReleaseStore): Promise<Response> {
   try {
     const url = new URL(request.url);
     if (request.method !== "GET") return Response.json({ error: "Use GET for release downloads." }, { status: 405, headers: { Allow: "GET" } });
@@ -50,11 +71,27 @@ export async function handleApi(request: Request, env: ApiEnv, fetcher: typeof f
     if (isAsset && (!tag || !validTag(tag) || ![FIRMWARE_NAME, "jag.txt"].includes(filename || ""))) throw new ApiError("Choose a valid release tag and supported firmware or database file.", 400);
     const headers: Record<string, string> = { Accept: "application/vnd.github+json", "User-Agent": "jaguar-web-programmer", "X-GitHub-Api-Version": "2022-11-28" };
     if (env.GITHUB_TOKEN) headers.Authorization = `Bearer ${env.GITHUB_TOKEN}`;
-    const upstream = await fetcher(`${API}/releases/${isAsset ? `tags/${encodeURIComponent(tag!)}` : "latest"}`, { headers, signal: AbortSignal.timeout(15_000) });
-    if (upstream.status === 404) throw new ApiError("No published firmware release was found. Check GitHub and try again.", 404);
-    if (!upstream.ok) throw new ApiError("GitHub is temporarily unavailable or its request limit was reached. Wait a few minutes and retry.", 503);
-    const release = normalizeRelease(await upstream.json());
-    if (!isAsset) return Response.json(release, { headers: { "Cache-Control": "public, max-age=300" } });
+    let upstream: Response | null = null;
+    try {
+      upstream = await fetcher(`${API}/releases/${isAsset ? `tags/${encodeURIComponent(tag!)}` : "latest"}`, { headers, signal: AbortSignal.timeout(15_000) });
+    } catch (error) { logGitHubFailure(env, null, error); }
+    if (upstream?.status === 404) throw new ApiError("No published firmware release was found. Check GitHub and try again.", 404);
+    let release: FirmwareRelease;
+    let fallback = false;
+    if (upstream?.ok) {
+      release = normalizeRelease(await upstream.json());
+      if (!isAsset) await store?.put(release).catch((error) => console.warn("Saving the last good release failed", error));
+    } else {
+      if (upstream) logGitHubFailure(env, upstream);
+      const saved = await store?.get().catch(() => null);
+      if (!saved || (isAsset && saved.tag !== tag)) throw new ApiError("GitHub is temporarily unavailable or its request limit was reached. Wait a few minutes and retry.", 503);
+      release = saved;
+      fallback = true;
+    }
+    const cacheHeaders: Record<string, string> = fallback
+      ? { "Cache-Control": "public, max-age=60", "X-Release-Source": "fallback" }
+      : { "Cache-Control": "public, max-age=300" };
+    if (!isAsset) return Response.json(release, { headers: cacheHeaders });
     if (release.tag !== tag) throw new ApiError("The release tag changed. Refresh the release before downloading.", 409);
     const selected = filename === FIRMWARE_NAME ? release.firmware : release.database;
     if (!selected) throw new ApiError("This release does not include jag.txt.", 404);
@@ -71,7 +108,7 @@ export async function handleApi(request: Request, env: ApiEnv, fetcher: typeof f
     return new Response(data, { headers: {
       "Content-Type": "application/octet-stream",
       "Content-Disposition": `attachment; filename="${filename}"`,
-      "Cache-Control": "public, max-age=300",
+      ...cacheHeaders,
       "X-Content-Type-Options": "nosniff",
     } });
   } catch (error) {

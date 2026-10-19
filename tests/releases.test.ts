@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { normalizeRelease, handleApi } from "../cloudflare/api";
+import { normalizeRelease, handleApi, type ReleaseStore } from "../cloudflare/api";
+import type { FirmwareRelease } from "../src/lib/release";
 
 const tag = "v1.0.0";
 const asset = (name: string) => ({
@@ -36,13 +37,63 @@ test("database is optional when a release has only firmware", () => {
   assert.equal(normalizeRelease({ ...release, assets: [release.assets[0]] }).database, null);
 });
 
-test("returns actionable errors when GitHub has no release or rate limits requests", async () => {
+test("returns actionable errors when GitHub has no release or rate limits requests", async (context) => {
+  const warn = context.mock.method(console, "warn", () => {});
   const request = new Request("https://reader.example/api/releases");
   for (const status of [404, 403, 429]) {
     const response = await handleApi(request, {}, async () => new Response("", { status }));
     assert.equal(response.status, status === 404 ? 404 : 503);
     assert.match((await response.json()).error, status === 404 ? /release/i : /GitHub/i);
   }
+  assert.equal(warn.mock.callCount(), 2);
+});
+
+function memoryStore(initial: FirmwareRelease | null = null): ReleaseStore & { saved: FirmwareRelease | null } {
+  return { saved: initial, async get() { return this.saved; }, async put(value) { this.saved = value; } };
+}
+
+test("serves the last good release and logs GitHub's rate-limit headers when GitHub fails", async (context) => {
+  const warn = context.mock.method(console, "warn", () => {});
+  const store = memoryStore();
+  const request = new Request("https://reader.example/api/releases");
+  const fresh = await handleApi(request, {}, async () => Response.json(release), store);
+  assert.equal(fresh.status, 200);
+  assert.equal(store.saved?.tag, tag);
+
+  const limited = new Response("", { status: 403, headers: { "x-ratelimit-limit": "60", "x-ratelimit-remaining": "0", "x-ratelimit-reset": "1792437187", "x-ratelimit-resource": "core" } });
+  const fallback = await handleApi(request, { GITHUB_TOKEN: "token" }, async () => limited, store);
+  assert.equal(fallback.status, 200);
+  assert.equal(fallback.headers.get("X-Release-Source"), "fallback");
+  assert.equal(fallback.headers.get("Cache-Control"), "public, max-age=60");
+  assert.equal((await fallback.json()).tag, tag);
+  const [, details] = warn.mock.calls[0].arguments as [string, { status: number; authenticated: boolean; rateLimit: Record<string, string | null> }];
+  assert.equal(details.status, 403);
+  assert.equal(details.authenticated, true);
+  assert.equal(details.rateLimit.remaining, "0");
+  assert.equal(details.rateLimit.reset, "2026-10-19T19:13:07.000Z");
+
+  const offline = await handleApi(request, {}, async () => { throw new TypeError("network down"); }, store);
+  assert.equal(offline.status, 200);
+  assert.equal(offline.headers.get("X-Release-Source"), "fallback");
+});
+
+test("does not fall back for a missing release or a different asset tag", async (context) => {
+  context.mock.method(console, "warn", () => {});
+  const store = memoryStore(normalizeRelease(release));
+  const missing = await handleApi(new Request("https://reader.example/api/releases"), {}, async () => new Response("", { status: 404 }), store);
+  assert.equal(missing.status, 404);
+  const otherTag = await handleApi(new Request("https://reader.example/api/assets?tag=v0.9.0&file=jag.txt"), {}, async () => new Response("", { status: 503 }), store);
+  assert.equal(otherTag.status, 503);
+});
+
+test("downloads the saved release's assets while GitHub's API is unavailable", async (context) => {
+  context.mock.method(console, "warn", () => {});
+  const store = memoryStore(normalizeRelease(downloadRelease));
+  const response = await handleApi(new Request("https://reader.example/api/assets?tag=v1.0.0&file=jaguarcartreader-mega2560.hex"), {}, async (input) =>
+    String(input).includes("api.github.com") ? new Response("", { status: 429 }) : new Response(downloadBody), store);
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("X-Release-Source"), "fallback");
+  assert.equal(await response.text(), downloadBody);
 });
 
 test("asset requests are pinned to selected tag and cannot proxy arbitrary files", async () => {
